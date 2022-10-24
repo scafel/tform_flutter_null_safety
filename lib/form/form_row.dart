@@ -13,6 +13,8 @@ abstract class TFormCloneable<T extends TFormCloneable<T>> {
 class TFormRow implements TFormCloneable<TFormRow> {
   /// 唯一标识
   String? tag;
+  /// 表单项名字
+  String name;
   /// 类型
   String? type;
   /// 是否必填
@@ -62,6 +64,7 @@ class TFormRow implements TFormCloneable<TFormRow> {
 
   TFormRow({
     this.tag,
+    this.name = "",
     this.type = TFormRowTypeInput,
     this.widgetBuilder,
     this.suffixWidget,
@@ -89,6 +92,7 @@ class TFormRow implements TFormCloneable<TFormRow> {
   /// 输入
   TFormRow.input({
     this.tag,
+    this.name = "",
     this.title = "",
     this.value = "",
     this.placeholder = "请输入",
@@ -114,6 +118,7 @@ class TFormRow implements TFormCloneable<TFormRow> {
   /// 单选
   TFormRow.selector({
     this.tag,
+    this.name = "",
     this.title = "",
     this.value = "",
     this.placeholder = "请选择",
@@ -133,6 +138,7 @@ class TFormRow implements TFormCloneable<TFormRow> {
   /// 多选
   TFormRow.multipleSelector({
     this.tag,
+    this.name = "",
     this.title = "",
     this.value = "",
     this.placeholder = "请选择",
@@ -152,6 +158,7 @@ class TFormRow implements TFormCloneable<TFormRow> {
   /// 自定义选择器，配合 state 定义自己的数据 onTap 点击事件
   TFormRow.customSelector({
     this.tag,
+    this.name = "",
     this.state,
     this.title = "",
     this.value = "",
@@ -173,6 +180,7 @@ class TFormRow implements TFormCloneable<TFormRow> {
   // 自定义无状态 cell
   TFormRow.customCell({
     this.tag,
+    this.name = "",
     this.title = "",
     this.widget,
     this.require = false,
@@ -181,18 +189,21 @@ class TFormRow implements TFormCloneable<TFormRow> {
   // 自定义有状态的 cell 配合 state 使用
   TFormRow.customCellBuilder({
     this.tag,
+    this.name = "",
     this.state,
     this.title = "",
     this.widgetBuilder,
     this.require = true,
     this.requireMsg,
     this.validator,
+    this.value,
   });
 
   @override
   TFormRow clone() {
     return TFormRow(options: [])
       ..tag = tag
+      ..name = name
       ..type = type
       ..widgetBuilder = widgetBuilder
       ..suffixWidget = suffixWidget

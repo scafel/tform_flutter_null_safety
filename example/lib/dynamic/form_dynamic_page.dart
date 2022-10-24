@@ -35,20 +35,36 @@ class FormDynamicPage extends StatelessWidget {
                 ),
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.only(
-                        top: 30, bottom: 30, left: 22, right: 22),
+                    padding: const EdgeInsets.only(top: 30, bottom: 30, left: 22, right: 22),
                     child: NextButton(
                       title: "提交",
                       onPressed: () {
                         //校验
-                        List errors =
-                            (_dynamicFormKey.currentState as TFormState)
-                                .validate();
+                        List errors = (_dynamicFormKey.currentState as TFormState).validate();
                         if (errors.isNotEmpty) {
                           showToast(errors.first);
                           return;
                         }
                         //提交
+                        Map<String , dynamic> formData = (_dynamicFormKey.currentState as TFormState).formData();
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          action: SnackBarAction(
+                            label: "关闭",
+                            onPressed: () {
+                              // Code to execute.
+                              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                            },
+                          ),
+                          content: Text(
+                            formData.toString(),
+                          ),
+                          duration: const Duration(milliseconds: 15000),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0, // Inner padding for SnackBar content.
+                              vertical: 10.0
+                          ),
+                          behavior: SnackBarBehavior.fixed,
+                        ));
                         showToast("成功");
                       },
                     ),
@@ -79,7 +95,6 @@ Future<dynamic>? getData() async {
       print(e);
     }
   }
-  print(rows);
   return rows;
 }
 
@@ -90,6 +105,7 @@ TFormRow getRow(e) {
     case 1:
       row = TFormRow.input(
         tag: e["proid"],
+        name: e["proid"],
         title: e["title"],
         placeholder: e["hintvalue"],
         value: e["value"],
@@ -102,6 +118,7 @@ TFormRow getRow(e) {
     case 2:
       row = TFormRow.customSelector(
         tag: e["proid"],
+        name: e["proid"],
         title: e["title"],
         placeholder: e["hintvalue"],
         value: e["value"],
@@ -116,6 +133,7 @@ TFormRow getRow(e) {
     case 4:
       row = TFormRow.selector(
         tag: e["proid"],
+        name: e["proid"],
         title: e["title"],
         placeholder: e["hintvalue"],
         value: e["value"],
@@ -128,6 +146,7 @@ TFormRow getRow(e) {
     case 9:
       row = TFormRow.customSelector(
         tag: e["proid"],
+        name: e["proid"],
         title: e["title"],
         placeholder: e["hintvalue"],
         value: e["value"],
@@ -158,6 +177,7 @@ TFormRow getRow(e) {
     case 6:
       row = TFormRow.input(
         tag: e["proid"],
+        name: e["proid"],
         title: e["title"],
         placeholder: e["hintvalue"],
         value: e["value"],
@@ -196,15 +216,14 @@ TFormRow getRow(e) {
     case 7:
       row = TFormRow.customCellBuilder(
         tag: e["proid"],
+        name: e["proid"],
         title: e["title"],
         state: e["piclist"],
         validator: (row) {
-          bool suc = (row.state as List)
-              .every((element) => (element["picurl"].length > 0));
-          if (!suc) {
-            row.requireMsg = "请完成${row.title}上传";
-          }
-          return suc;
+          List<String> images = [];
+          (row.state as List).forEach((e) => e["picurl"].length>0?images.add(e["picurl"]):null);
+          row.value = images.toString();
+          return images.length >= int.parse(e["mustLength"]);
         },
         widgetBuilder: (context, row) {
           return CustomPhotosWidget(row: row);
@@ -214,6 +233,7 @@ TFormRow getRow(e) {
     default:
       row = TFormRow.input(
         tag: e["proid"],
+        name: e["proid"],
         title: e["title"],
         placeholder: e["hintvalue"],
         value: e["value"],

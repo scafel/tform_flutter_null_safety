@@ -31,7 +31,27 @@ class FormPage extends StatelessWidget {
                 return;
               }
               //通过
+              Map<String , dynamic> formData = (_formKey.currentState as TFormState).formData();
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                action: SnackBarAction(
+                  label: "关闭",
+                  onPressed: () {
+                    // Code to execute.
+                    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  },
+                ),
+                content: Text(
+                  formData.toString(),
+                ),
+                duration: const Duration(milliseconds: 15000),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0, // Inner padding for SnackBar content.
+                    vertical: 10.0
+                ),
+                behavior: SnackBarBehavior.fixed,
+              ));
               showToast("提交成功");
+
             },
           ),
         ],
@@ -51,6 +71,7 @@ List<TFormRow> buildFormRows() {
   return [
     TFormRow.input(
       title: "姓名",
+      name:"userName",
       placeholder: "请输入姓名",
       value: "呀哈哈",
       fieldConfig: TFormFieldConfig(
@@ -62,6 +83,7 @@ List<TFormRow> buildFormRows() {
     ),
     TFormRow.input(
       enabled: false,
+      name:"IDCard",
       requireStar: true,
       title: "身份证号",
       placeholder: "请输入身份证号",
@@ -70,6 +92,7 @@ List<TFormRow> buildFormRows() {
     TFormRow.input(
       keyboardType: TextInputType.number,
       title: "预留手机号",
+      name:"phoneNumber",
       placeholder: "请输入手机号",
       maxLength: 11,
       requireMsg: "请输入正确的手机号",
@@ -83,6 +106,7 @@ List<TFormRow> buildFormRows() {
     ),
     TFormRow.input(
       title: "验证码",
+      name:"varCode",
       placeholder: "请输入验证码",
       suffixWidget: (context, row) {
         return VerifitionCodeButton(
@@ -96,6 +120,7 @@ List<TFormRow> buildFormRows() {
     ),
     TFormRow.input(
       title: "* 密码",
+      name:"password",
       value: "123456",
       obscureText: true,
       state: false,
@@ -117,14 +142,15 @@ List<TFormRow> buildFormRows() {
     ),
     TFormRow.customSelector(
       title: "婚姻状况",
+      name:"marital",
       placeholder: "请选择",
       state: [
         ["未婚", "已婚"],
         [
           TFormRow.input(
-              title: "配偶姓名", placeholder: "请输入配偶姓名", requireStar: true),
+              name:"maritalName",title: "配偶姓名", placeholder: "请输入配偶姓名", requireStar: true),
           TFormRow.input(
-              title: "配偶电话", placeholder: "请输入配偶电话", requireStar: true)
+              name:"maritalPhone",title: "配偶电话", placeholder: "请输入配偶电话", requireStar: true)
         ]
       ],
       onTap: (context, row) async {
@@ -141,6 +167,7 @@ List<TFormRow> buildFormRows() {
     ),
     TFormRow.selector(
       title: "学历",
+      name:"edu",
       placeholder: "请选择",
       options: [
         TFormOptionModel(value: "专科"),
@@ -151,16 +178,13 @@ List<TFormRow> buildFormRows() {
     ),
     TFormRow.multipleSelector(
       title: "家庭成员",
+      name:"family",
       placeholder: "请选择",
-      options: [
-        TFormOptionModel(value: "父亲", selected: false),
-        TFormOptionModel(value: "母亲", selected: false),
-        TFormOptionModel(value: "儿子", selected: false),
-        TFormOptionModel(value: "女儿", selected: false)
-      ],
+      options:["儿子", "父亲" , "母亲"],
     ),
     TFormRow.customSelector(
       title: "出生年月",
+      name:"birth",
       placeholder: "请选择",
       onTap: (context, row) async {
         return showPickerDate(context);
@@ -179,21 +203,17 @@ List<TFormRow> buildFormRows() {
     ),
     TFormRow.customCellBuilder(
       title: "房屋照片",
+      name:"houseImage",
       state: [
-        {"picurl": ""},
-        {"picurl": ""},
-        {"picurl": ""},
         {"picurl": ""},
         {"picurl": ""},
       ],
       requireMsg: "请完成上传房屋照片",
       validator: (row) {
-        bool suc = (row.state as List)
-            .every((element) => (element["picurl"].length > 0));
-        if (!suc) {
-          row.requireMsg = "请完成${row.title}上传";
-        }
-        return suc;
+        List<String> images = [];
+        (row.state as List).forEach((e) => e["picurl"].length>0?images.add(e["picurl"]):null);
+        row.value = images.toString();
+        return images.isNotEmpty;
       },
       widgetBuilder: (context, row) {
         return CustomPhotosWidget(row: row);

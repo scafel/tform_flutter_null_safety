@@ -96,6 +96,15 @@ class TFormState extends State<TForm> {
     return errors;
   }
 
+  Map<String , dynamic> formData(){
+    FocusScope.of(context).requestFocus(FocusNode());
+    Map<String , dynamic> data = {};
+    rows.forEach((TFormRow element) {
+      data[element.name] = element.value;
+    });
+    return data;
+  }
+
   @override
   Widget build(BuildContext context) {
     return _TFormScope(
